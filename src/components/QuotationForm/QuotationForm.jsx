@@ -238,8 +238,8 @@ const QuotationForm = ({ onFormValidationChange }) => {
           },
         }}
       />
+      <PromotionTable/>
     </div>
-    
   );
 };
 

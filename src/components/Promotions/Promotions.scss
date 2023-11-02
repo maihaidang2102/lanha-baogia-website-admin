@@ -1,10 +1,10 @@
 .promotion-table {
     table {
-      width: 100%;
+      width: 60%;
       border-collapse: collapse;
   
       thead {
-        background-color: #333;
+        background-color: #727272;
         color: #fff;
   
         th {
@@ -12,11 +12,18 @@
           text-align: center;
         }
       }
+      .text-input {
+        border: none;
+        text-align: center;
+        border-bottom: 1px dashed  #797777; /* Màu và kiểu đường kẻ của gạch chân */
+        outline: none; /* Loại bỏ viền khi input được focus */
+      }
+      
   
       tbody {
         tr {
           td {
-            padding: 0px;
+            padding: 5px;
             border: 1px solid #000000;
             text-align: center;
             .upper-part {
@@ -38,5 +45,29 @@
         }
       }
     }
+  }
+
+  .add-roww-button {
+    background-color: #ffffff;
+    color: #007BFF;
+    border: none;
+    width: 60%;
+    padding: 5px 200px; 
+    border-radius: 5px;
+    border: 1px solid #007BFF;
+    border-color: #007BFF;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center; /* Canh giữa theo chiều ngang */
+    margin: 5px auto; /* Canh giữa theo chiều dọc và giữa màn hình */
+  }
+  
+  .add-roww-button i {
+    margin-right: 5px;
+    font-size: 18px;
+  }
+  
+  .add-roww-button:hover {
+    //background-color: #0056b3;
   }
   

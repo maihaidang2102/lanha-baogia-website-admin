@@ -74,13 +74,12 @@
     background-color: #ffffff;
     color: #007BFF;
     border: none;
-    width: 100%;
+    width: 50%;
     padding: 5px 200px; 
     border-radius: 5px;
     border: 1px solid #007BFF;
     border-color: #007BFF;
     cursor: pointer;
-    display: flex;
     align-items: center;
     justify-content: center; /* Canh giữa theo chiều ngang */
     margin: 5px auto; /* Canh giữa theo chiều dọc và giữa màn hình */
@@ -94,6 +93,29 @@
   .add-row-button:hover {
     //background-color: #0056b3;
   }
+  .add-row2-button {
+    background-color: #ffffff;
+    color: #ff0015;
+    border: none;
+    width: 50%;
+    padding: 5px 0; 
+    border-radius: 5px;
+    border: 1px solid #007BFF;
+    border-color: #ff0015;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center; /* Canh giữa theo chiều ngang */
+    margin: 5px auto; /* Canh giữa theo chiều dọc và giữa màn hình */
+  }
+  
+  .add-row2-button i {
+    margin-right: 5px;
+    font-size: 18px;
+  }
+  
+  .add-row2-button:hover {
+    //background-color: #0056b3;
+  }
 
   .size-item {
     width: 5.2%;
@@ -105,7 +127,7 @@
   .size-item input {
     width: 80%; /* Điều chỉnh kích thước */
     //border: none; /* Loại bỏ border */
-    height: 20px;
+    // height: 20px;
     text-align: center;
     //border-bottom: 1px dotted #060607; /* Thêm gạch chân dưới ô input */
     transition: border-bottom 0.2s;
@@ -408,9 +430,55 @@ input:disabled {
   cursor: pointer; /* Hiển thị con trỏ khi di chuyển qua nút */
   font-size: 14px; /* Cỡ chữ */
 }
+.unit input{
+  width: 80%;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+.weight input{
+  width: 80%;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+.price input{
+  width: 80%;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+.total input{
+  width: 80%;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+.product input{
+  width: 95%;
 
-
-
+  border: 1px solid #ccc;
+}
+.description input{
+  width: 95%;
+  overflow-wrap: break-word; /* Sẽ đảm bảo nội dung dài sẽ xuống hàng thay vì tràn ra ngoài */
+  white-space: pre-wrap;
+  border: 1px solid #ccc;
+}
+.note input{
+  width: 95%;
+  border: 1px solid #ccc;
+}
+.reference-image input{
+  width: 80%;
+  border: 1px solid #ccc;
+}
+.size-item input{
+  border: 1px solid #ccc;
+}
+textarea {
+  width: 93%;
+  padding: 5px;  
+  overflow : hidden;
+  //max-height: max-content; /* Độ cao tối thiểu */
+  resize: none; /* Không cho phép thay đổi kích thước bằng con trỏ */
+}
 
 
 

@@ -33,7 +33,8 @@ const Slideshow = ({ imageUrls, onClose }) => {
           <FontAwesomeIcon icon={faChevronLeft} size="2x" color="#DDDDDD" />
         </div>
         <img
-          src={`https://api.lanha.vn/profiles/icon-img/${imageUrls[currentIndex]}`}
+          // src={`https://api.lanha.vn/profiles/icon-img/${imageUrls[currentIndex]}`}
+          src={imageUrls[currentIndex].startsWith("ICON_QUOTE") ? `https://lanha-bucket.s3.ap-southeast-1.amazonaws.com/uploads/images/icons/${imageUrls[currentIndex]}` : imageUrls[currentIndex]}
           alt={`Slide ${currentIndex + 1}`}
           className="slide"
         />
@@ -46,7 +47,7 @@ const Slideshow = ({ imageUrls, onClose }) => {
     {imageList.map((imageUrl, index) => (
       <img
         key={index}
-        src={`https://api.lanha.vn/profiles/icon-img/${imageUrl}`}
+        src={imageUrls[currentIndex].startsWith("ICON_QUOTE") ? `https://lanha-bucket.s3.ap-southeast-1.amazonaws.com/uploads/images/icons/${imageUrl}` : imageUrl}
         alt={`Image ${index + 1}`}
         className={`image-list-item ${index === currentIndex ? 'selected' : ''}`}
               onClick={() => selectImage(index)}

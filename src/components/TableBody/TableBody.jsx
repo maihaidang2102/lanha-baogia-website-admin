@@ -9,6 +9,7 @@ const TableBody = (props) => {
   const [slideshowImageUrls, setSlideshowImageUrls] = useState([]);
   const [isSlideshowOpen, setIsSlideshowOpen] = useState(false);
   const inputRef = useRef(null);
+  const inputRefCustom = useRef(null);
 
   const openSlideshow = (imageUrls) => {
     setSlideshowImageUrls(imageUrls);
@@ -26,7 +27,6 @@ const TableBody = (props) => {
     fetch('https://api.lanha.vn/api/v1/quote/products')
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setApiProducts(data.data);
         setApiResponse(data);
       })
@@ -216,13 +216,17 @@ const TableBody = (props) => {
 
   const calculateTotalPrice = () => {
     let totalPrice = 0;
-
+  
     tableData.forEach((row) => {
       const numericTotal = parseFloat(row.total) || 0;
-
       totalPrice += numericTotal;
     });
-
+  
+    customRows.forEach((row) => {
+      const numericTotal = parseFloat(row.total) || 0;
+      totalPrice += numericTotal;
+    });
+  
     setFooterRows((prevFooterRows) =>
       prevFooterRows.map((row, index) =>
         index === 0 ? { ...row, total: totalPrice.toString() } : row
@@ -378,16 +382,13 @@ const TableBody = (props) => {
         updatedHeightColumnEnabled[index] = false;
         setIsHeightColumnEnabled(updatedHeightColumnEnabled);
       }
-      console.log(selectedProduct.formulaQuantity);
       if(selectedProduct.formulaQuantity==''){
         const updatedWeightColumnEnabled = [...isWeightColumnEnabled];
         updatedWeightColumnEnabled[index] = true;
-        console.log(updatedWeightColumnEnabled[index]);
         setIsWeightColumnEnabled(updatedWeightColumnEnabled);
       }else{
         const updatedWeightColumnEnabled = [...isWeightColumnEnabled];
         updatedWeightColumnEnabled[index] = false;
-        console.log(updatedWeightColumnEnabled[index]); 
         setIsWeightColumnEnabled(updatedWeightColumnEnabled);
       }
 
@@ -409,9 +410,7 @@ const TableBody = (props) => {
     if (matchedMaterial) {
       const imgUrls = matchedMaterial.material.imgUrl;
       updatedTableData[index].referenceImage = imgUrls;
-      console.log("Image URLs:", imgUrls);
     } else {
-      console.log("Không tìm thấy mô tả khớp.");
     }
     if (selectedValue && matchedMaterial.material && matchedMaterial.material.price!=0) {
       //updatedTableData[index].price = calculatePrice(matchedMaterial.material.price);
@@ -453,8 +452,6 @@ const TableBody = (props) => {
       updatedTableData[index].weight = weight;
       const price = parseFloat(updatedTableData[index].price) || 0;
       const total = calculateTotal(product, length, width, height, weight, price);
-      console.log("WWWW",weight)
-      console.log("yyyy",total)
       updatedTableData[index].total = total.toString();
 
     }else{
@@ -462,13 +459,29 @@ const TableBody = (props) => {
       updatedTableData[index].weight = weight;
       const price = parseFloat(updatedTableData[index].price) || 0;
       const total = calculateTotal(product, length, width, height, weight, price);
-      console.log("EEEE",weight)
-      console.log("tttt",total)
       updatedTableData[index].total = total;
     }
     const unit = calculateUnit(product, length, width, height);
     updatedTableData[index].unit = unit
     setTableData(updatedTableData);
+  };
+
+  const handleInputChangeCustom = (index, field, value) => {
+    // Tạo một bản sao của trạng thái hiện tại
+    const updatedTableDataCustom = [...customRows];
+
+    // Cập nhật giá trị trong ô tương ứng
+    updatedTableDataCustom[index][field] = value;
+    if (field === 'price' || field === 'weight') {
+      const price = parseFloat(updatedTableDataCustom[index].price) || 0;
+      const weight = parseFloat(updatedTableDataCustom[index].weight) || 0;
+      const total = price * weight;
+  
+      updatedTableDataCustom[index].total = total;
+    }
+
+    // Cập nhật trạng thái với dữ liệu đã thay đổi
+    setCustomRows(updatedTableDataCustom);
   };
 
   function addImage() {
@@ -480,36 +493,124 @@ const TableBody = (props) => {
     const updatedTableData = [...tableData];
     updatedTableData[index].referenceImage = [];
     setTableData(updatedTableData);
-    closeContextMenu(); // Đóng menu tùy chọn sau khi xóa ảnh
   }
   
   function deleteImage(index) {
-    console.log(index);
     if (index !== null) {
       deleteImagesInRow(index);
-      console.log("KKKKKKKKKKKKKK")
-      setContextMenuIndex(null);
+    }
+  }
+
+  function deleteImagesInRowCustom(index) {
+    const updatedTableData = [...customRows];
+    updatedTableData[index].referenceImage = [];
+    setCustomRows(updatedTableData);
+  }
+  
+  function deleteImageCustom(index) {
+    if (index !== null) {
+      deleteImagesInRowCustom(index);
     }
   }
   
+  const [imageRowIndex, setImageRowIndex] = useState(null);
+const [imageRowIndexCustom, setImageRowIndexCustom] = useState(null);
+
+const addImageToRow = (index) => {
+  setImageRowIndex(index);
+  console.log("123 ",index);
+  inputRef.current.click();
+};
+
+const addImageToRowCustom = (index) => {
+  setImageRowIndexCustom(index);
+  console.log("456  ",index);
+  inputRefCustom.current.click();
+};
+
+const handleImageSelection = (index, selectedFiles) => {
+  console.log("HHHHHHHHHHHHHHHHH")
+
+  const updatedTableData = [...tableData];
+  const referenceImage = [];
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+    const imageURL = URL.createObjectURL(file);
+    referenceImage.push(imageURL);
+  }
+
+  updatedTableData[index].referenceImage = referenceImage;
+  setTableData(updatedTableData);
+};
+
+const handleImageSelectionCustom = (index, selectedFiles) => {
+  console.log("KKKKKKKKKKKKKK")
+
+  const updatedCustomRows = [...customRows];
+  const referenceImageCustom = [];
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+    const imageURL = URL.createObjectURL(file);
+    referenceImageCustom.push(imageURL);
+  }
+
+  updatedCustomRows[index].referenceImage = referenceImageCustom;
+  setCustomRows(updatedCustomRows);
+};
+
   
-  const handleImageSelection = (index, selectedFiles) => {
-    const updatedTableData = [...tableData];
-    const referenceImage = [];
   
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      const imageURL = URL.createObjectURL(file);
-      referenceImage.push(imageURL);
-  
-      console.log(`Đường dẫn ảnh #${i + 1}: ${imageURL}`);
-    }
-  
-    updatedTableData[index].referenceImage = referenceImage;
-    setTableData(updatedTableData);
+  const [customRows, setCustomRows] = useState([
+    // Dữ liệu hàng kiểu mới (tất cả ô đều là kiểu input text)
+    // {
+    //   product: '',
+    //   description: '',
+    //   unit: '',
+    //   weight: '',
+    //   price: '',
+    //   total: '',
+    //   note: '',
+    //   referenceImage: [],
+    //   length: '',
+    //   width: '',
+    //   height: '',
+    // },
+  ]);
+  const addCustomRow = () => {
+    const newRow = {
+      product: '',
+      description: '',
+      unit: '',
+      weight: '',
+      price: '',
+      total: '',
+      note: '',
+      referenceImage: [],
+      length: '',
+      width: '',
+      height: '',
+    };
+
+    // Thêm hàng mới kiểu mới vào trạng thái dữ liệu bảng
+    setCustomRows([...customRows, newRow]);
   };
-  
-  
+  useEffect(() => {
+    const handleResize = () => {
+      const textArea = document.getElementById('myTextarea');
+      if (textArea) {
+        textArea.style.height = 'auto'; // Đặt lại độ cao thành 'auto' trước khi tính toán lại
+        textArea.style.height = textArea.scrollHeight + 'px'; // Cập nhật độ cao dựa trên scrollHeight
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <div>
@@ -567,7 +668,6 @@ const TableBody = (props) => {
                   style={isLengthColumnEnabled[index] ? {  border: '1px solid #C0C0C0' } : {border: 'none'}}
                   className='noprint-border'
                 />
-                {/* {console.log(`isLengthColumnEnabled[${index}] = ${!isLengthColumnEnabled[index]}`)} */}
               </td>
               <td className="table-cell size-item">
                 <input
@@ -618,7 +718,8 @@ const TableBody = (props) => {
                         key={imgIndex}
                         className="reference-image-item"
                         style={{ width: "50%" }}
-                        src={`https://lanha-bucket.s3.ap-southeast-1.amazonaws.com/uploads/images/icons/${imgUrl}`}
+                        // src={`https://lanha-bucket.s3.ap-southeast-1.amazonaws.com/uploads/images/icons/${imgUrl}`}
+                        src={imgUrl.startsWith("ICON_QUOTE") ? `https://lanha-bucket.s3.ap-southeast-1.amazonaws.com/uploads/images/icons/${imgUrl}` : imgUrl}
                         alt={`Ảnh mô tả ${imgIndex + 1}`}
                         onClick={() => openSlideshow(row.referenceImage)}
                       />
@@ -628,29 +729,216 @@ const TableBody = (props) => {
                     <div class="menu-icon">
                       <i class="fas fa-bars" id="menu-trigger"></i>
                       <div class="options-menu" id="options-menu">
-                        <div class="option" onClick={addImage}>Thêm ảnh</div>
+                        <div class="option" onClick={() => inputRef.current.click()}>Thêm ảnh</div>
                         <div class="option" onClick={() => deleteImage(index)}>Xóa ảnh</div>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <button className="button-add-image" onClick={() => inputRef.current.click()}>Thêm ảnh</button>
+                  <button className="button-add-image" onClick={() => addImageToRow(index)}>Thêm ảnh</button>
+                )}
+                <input
+                type="file"
+                id="file-input"
+                ref={inputRef}
+                style={{ display: 'none' }}
+                onChange={(e) => handleImageSelection(imageRowIndex, e.target.files)}
+              />
+              </div>
+              
+            </td>
+
+            </tr>
+          ))}
+          {customRows.map((row, index) => (
+            // Hiển thị hàng kiểu mới (tất cả ô đều là input text)
+            <tr key={index + 100}>
+              <td className="table-cell product">
+            <textarea
+              value={row.product}
+              spellCheck={false}
+              onChange={(e) => {
+                handleInputChangeCustom(index, 'product', e.target.value);
+
+                if (e.target.value === '') {
+                  e.target.style.height = 'auto';
+                } else {
+                  const valueLength = e.target.value.length;
+                  let extraHeight = 0;
+                  if (valueLength > 80) {
+                    extraHeight = 40;
+                  } else if (valueLength > 60) {
+                    extraHeight = 30;
+                  } else if (valueLength > 40) {
+                    extraHeight = 20;
+                  } else if (valueLength > 20) {
+                    extraHeight = 10;
+                  }
+                  e.target.style.height = 'auto';
+                  e.target.style.height = Math.min(e.target.scrollHeight + extraHeight, 300) + 'px'; // Giới hạn độ cao tối đa
+                }
+              }}
+              style={{
+                overflowWrap: 'break-word',
+              }}
+              rows={row.description.split('\n').length}
+            />
+          </td>
+            <td className="table-cell description">
+            <textarea
+              value={row.description}
+              spellCheck={false}
+              onChange={(e) => {
+                handleInputChangeCustom(index, 'description', e.target.value);
+
+                if (e.target.value === '') {
+                  e.target.style.height = 'auto';
+                } else {
+                  const valueLength = e.target.value.length;
+                  let extraHeight = 0;
+                  if (valueLength > 80) {
+                    extraHeight = 40;
+                  } else if (valueLength > 60) {
+                    extraHeight = 30;
+                  } else if (valueLength > 40) {
+                    extraHeight = 20;
+                  } else if (valueLength > 20) {
+                    extraHeight = 10;
+                  }
+                  e.target.style.height = 'auto';
+                  e.target.style.height = Math.min(e.target.scrollHeight + extraHeight, 300) + 'px'; // Giới hạn độ cao tối đa
+                }
+              }}
+              style={{
+                overflowWrap: 'break-word',
+              }}
+              rows={row.description.split('\n').length}
+            />
+          </td>
+              <td className="table-cell size-item">
+                <input
+                  type="text"
+                  value={row.length}
+                  onChange={(e) => handleInputChangeCustom(index, 'length', e.target.value)}
+                />
+              </td>
+              <td className="table-cell size-item">
+                <input
+                  type="text"
+                  value={row.width}
+                  onChange={(e) => handleInputChangeCustom(index, 'width', e.target.value)}
+                />
+              </td>
+              <td className="table-cell size-item">
+                <input
+                  type="text"
+                  value={row.height}
+                  onChange={(e) => handleInputChangeCustom(index, 'height', e.target.value)}
+                />
+              </td>
+              <td className="table-cell unit">
+                <input
+                  type="text"
+                  value={row.unit}
+                  onChange={(e) => handleInputChangeCustom(index, 'unit', e.target.value)}
+                />
+              </td>
+              <td className="table-cell weight">
+                <input
+                  type="text"
+                  value={row.weight}
+                  onChange={(e) => handleInputChangeCustom(index, 'weight', e.target.value)}
+                />
+              </td>
+              <td className="table-cell price">
+                <input
+                  type="text"
+                  value={row.price}
+                  onChange={(e) => handleInputChangeCustom(index, 'price', e.target.value)}
+                />
+              </td>
+              <td className="table-cell total">
+              {Number(row.total).toLocaleString('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+              })}
+            </td>
+            <td className="table-cell note">
+            <textarea
+              value={row.note}
+              spellCheck={false}
+              onChange={(e) => {
+                handleInputChangeCustom(index, 'note', e.target.value);
+
+                if (e.target.value === '') {
+                  e.target.style.height = 'auto';
+                } else {
+                  const valueLength = e.target.value.length;
+                  let extraHeight = 0;
+                  if (valueLength > 80) {
+                    extraHeight = 40;
+                  } else if (valueLength > 60) {
+                    extraHeight = 30;
+                  } else if (valueLength > 40) {
+                    extraHeight = 20;
+                  } else if (valueLength > 20) {
+                    extraHeight = 10;
+                  }
+                  e.target.style.height = 'auto';
+                  e.target.style.height = Math.min(e.target.scrollHeight + extraHeight, 300) + 'px'; // Giới hạn độ cao tối đa
+                }
+              }}
+              style={{
+                overflowWrap: 'break-word',
+              }}
+              rows={row.description.split('\n').length}
+            />
+          </td>
+              <td className="table-cell reference-image">
+              <div className="image-container">
+                {Array.isArray(row.referenceImage) && row.referenceImage.length > 0 ? (
+                  <div className="reference-image-tooltip">
+                    {row.referenceImage.slice(0, 1).map((imgUrl, imgIndex) => (
+                      <img
+                        key={imgIndex}
+                        className="reference-image-item"
+                        style={{ width: "50%" }}
+                        // src={`https://lanha-bucket.s3.ap-southeast-1.amazonaws.com/uploads/images/icons/${imgUrl}`}
+                        src={imgUrl.startsWith("ICON_QUOTE") ? `https://lanha-bucket.s3.ap-southeast-1.amazonaws.com/uploads/images/icons/${imgUrl}` : imgUrl}
+                        alt={`Ảnh mô tả ${imgIndex + 1}`}
+                        onClick={() => openSlideshow(row.referenceImage)}
+                      />
+                    ))}
+                    <span className="tooltip-text">Nhấn để xem thêm hình ảnh khác</span>
+                    <div className='multy-picture toggle-icon'>. . .</div>
+                    <div class="menu-icon">
+                      <i class="fas fa-bars" id="menu-trigger"></i>
+                      <div class="options-menu" id="options-menu">
+                        <div class="option" onClick={() => inputRefCustom.current.click()}>Thêm ảnh</div>
+                        <div class="option" onClick={() => deleteImageCustom(index)}>Xóa ảnh</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <button className="button-add-image" onClick={() => addImageToRowCustom(index)}>Thêm ảnh</button>
                 )}
               </div>
               <input
                 type="file"
                 id="file-input"
-                ref={inputRef}
+                ref={inputRefCustom}
                 style={{ display: 'none' }}
-                onChange={(e) => handleImageSelection(index, e.target.files)}
+                onChange={(e) => handleImageSelectionCustom(imageRowIndexCustom, e.target.files)}
               />
-            </td>
-
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
       <button onClick={addRow} className="add-row-button toggle-icon">
+        <i className="fas fa-plus "></i>
+      </button>
+      <button onClick={addCustomRow} className="add-row2-button toggle-icon">
         <i className="fas fa-plus "></i>
       </button>
       {contextMenuIndex !== null && (
